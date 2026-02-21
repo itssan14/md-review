@@ -1,0 +1,15 @@
+{
+  "name": "md-review",
+  "version": "0.1.0",
+  "description": "Browser-based markdown annotation tool with clipboard feedback output",
+  "bin": {
+    "md-review": "./src/index.ts"
+  },
+  "scripts": {
+    "start": "bun src/index.ts",
+    "build": "bun build --compile src/index.ts --outfile dist/md-review"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}
