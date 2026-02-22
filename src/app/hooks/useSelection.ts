@@ -20,7 +20,11 @@ export function useSelection(contentAreaRef: () => HTMLElement | undefined) {
     }
 
     const area = contentAreaRef();
-    if (!area || !area.contains(sel.anchorNode) || !area.contains(sel.focusNode)) {
+    if (
+      !area ||
+      !area.contains(sel.anchorNode) ||
+      !area.contains(sel.focusNode)
+    ) {
       setPending(null);
       return;
     }
@@ -39,7 +43,8 @@ export function useSelection(contentAreaRef: () => HTMLElement | undefined) {
 
     const startLine = Math.min(aStart, fStart);
     const endLine = Math.max(aEnd, fEnd);
-    const laterBlock = anchorBlock.offsetTop > focusBlock.offsetTop ? anchorBlock : focusBlock;
+    const laterBlock =
+      anchorBlock.offsetTop > focusBlock.offsetTop ? anchorBlock : focusBlock;
 
     const range = sel.getRangeAt(0);
     const rect = range.getBoundingClientRect();

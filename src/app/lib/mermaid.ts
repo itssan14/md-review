@@ -25,7 +25,9 @@ export async function renderMermaidBlocks(container: HTMLElement) {
     const renderDiv = el.querySelector(".mermaid-render");
     if (!source || !renderDiv) continue;
     const code = source.textContent || "";
-    const id = el.getAttribute("data-mermaid-id") || "mermaid-" + Math.random().toString(36).slice(2, 9);
+    const id =
+      el.getAttribute("data-mermaid-id") ||
+      "mermaid-" + Math.random().toString(36).slice(2, 9);
     try {
       const { svg } = await window.__mermaid!.render(id, code);
       renderDiv.innerHTML = svg;

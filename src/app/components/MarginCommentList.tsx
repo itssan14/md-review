@@ -128,7 +128,13 @@ export default function MarginCommentList(props: MarginCommentListProps) {
       </For>
       <Show when={props.pendingForm?.()}>
         {(form) => (
-          <div style={{ position: "absolute", top: `${form().y}px`, width: "100%" }}>
+          <div
+            style={{
+              position: "absolute",
+              top: `${form().y}px`,
+              width: "100%",
+            }}
+          >
             <CommentForm
               startLine={form().startLine}
               endLine={form().endLine}

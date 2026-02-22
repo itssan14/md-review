@@ -26,7 +26,8 @@ export default function CommentForm(props: CommentFormProps) {
       addComment({
         startLine: props.startLine,
         endLine: props.endLine,
-        context: props.context || (props.block?.textContent || "").trim().slice(0, 60),
+        context:
+          props.context || (props.block?.textContent || "").trim().slice(0, 60),
         text,
       });
     }
@@ -34,12 +35,17 @@ export default function CommentForm(props: CommentFormProps) {
   }
 
   function handleKeyDown(e: KeyboardEvent) {
-    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); save(); }
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      save();
+    }
     if (e.key === "Escape") props.onClose();
   }
 
   const ref = () =>
-    props.startLine === props.endLine ? `L${props.startLine}` : `L${props.startLine}-${props.endLine}`;
+    props.startLine === props.endLine
+      ? `L${props.startLine}`
+      : `L${props.startLine}-${props.endLine}`;
 
   const contextPreview = () => {
     const ctx = props.context || "";

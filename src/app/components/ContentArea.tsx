@@ -1,5 +1,9 @@
 import { onMount, createEffect, on } from "solid-js";
-import { configureMarked, renderMarkdown, highlightCodeBlocks } from "../lib/markdown";
+import {
+  configureMarked,
+  renderMarkdown,
+  highlightCodeBlocks,
+} from "../lib/markdown";
 import { buildLineMap, matchBlockToMap } from "../lib/line-map";
 import { waitForMermaid, renderMermaidBlocks } from "../lib/mermaid";
 import { useSelection } from "../hooks/useSelection";
@@ -43,7 +47,10 @@ export default function ContentArea(props: ContentAreaProps) {
     const lineMap = buildLineMap(props.rawMarkdown);
     const blocks = Array.from(areaRef.children).filter((el) => {
       const tag = el.tagName.toLowerCase();
-      return /^(h[1-6]|p|ul|ol|blockquote|pre|table|hr)$/.test(tag) || el.classList.contains("mermaid-container");
+      return (
+        /^(h[1-6]|p|ul|ol|blockquote|pre|table|hr)$/.test(tag) ||
+        el.classList.contains("mermaid-container")
+      );
     });
 
     for (const block of blocks) {
@@ -99,7 +106,9 @@ export default function ContentArea(props: ContentAreaProps) {
   }
 
   function clearRangeSelection() {
-    areaRef.querySelectorAll(".range-selected").forEach((el) => el.classList.remove("range-selected"));
+    areaRef
+      .querySelectorAll(".range-selected")
+      .forEach((el) => el.classList.remove("range-selected"));
   }
 
   return (

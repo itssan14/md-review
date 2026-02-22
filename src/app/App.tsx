@@ -23,7 +23,10 @@ function readInjectedData(): ReviewData {
   const raw = el?.textContent?.trim();
   // Valid injected data is JSON starting with '{'. The build-time placeholder is not.
   if (!raw || raw.charAt(0) !== "{") {
-    return { rawMarkdown: "# No data\n\nNo markdown data was injected.", filename: "unknown" };
+    return {
+      rawMarkdown: "# No data\n\nNo markdown data was injected.",
+      filename: "unknown",
+    };
   }
   return JSON.parse(raw);
 }
@@ -32,7 +35,9 @@ export default function App() {
   const { rawMarkdown, filename } = readInjectedData();
   const theme = useSystemTheme();
   const [toastMsg, setToastMsg] = createSignal("");
-  const [pendingForm, setPendingForm] = createSignal<PendingFormData | null>(null);
+  const [pendingForm, setPendingForm] = createSignal<PendingFormData | null>(
+    null,
+  );
 
   let contentAreaEl: HTMLElement | undefined;
   let containerEl: HTMLElement | undefined;
@@ -58,8 +63,12 @@ export default function App() {
     const isDark = theme() === "dark";
     document.documentElement.classList.toggle("dark", isDark);
 
-    const lightEl = document.getElementById("hljs-light") as HTMLStyleElement | null;
-    const darkEl = document.getElementById("hljs-dark") as HTMLStyleElement | null;
+    const lightEl = document.getElementById(
+      "hljs-light",
+    ) as HTMLStyleElement | null;
+    const darkEl = document.getElementById(
+      "hljs-dark",
+    ) as HTMLStyleElement | null;
     if (lightEl) lightEl.disabled = isDark;
     if (darkEl) darkEl.disabled = !isDark;
 
@@ -69,7 +78,12 @@ export default function App() {
     }
   });
 
-  function handleCommentRequest({ block, startLine, endLine, context }: CommentRequest) {
+  function handleCommentRequest({
+    block,
+    startLine,
+    endLine,
+    context,
+  }: CommentRequest) {
     if (!marginListEl) return;
     const blockRect = block.getBoundingClientRect();
     const listRect = marginListEl.getBoundingClientRect();

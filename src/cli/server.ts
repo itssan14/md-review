@@ -21,7 +21,9 @@ export async function startServer(content: string, filename: string) {
   const distFile = Bun.file(distPath);
 
   if (!(await distFile.exists())) {
-    console.error("Error: dist/index.html not found. Run `bun run build` first.");
+    console.error(
+      "Error: dist/index.html not found. Run `bun run build` first.",
+    );
     process.exit(1);
   }
 
@@ -42,14 +44,19 @@ export async function startServer(content: string, filename: string) {
 
       if (url.pathname === "/done" && req.method === "POST") {
         const body = await req.text();
-        const { feedback, count } = JSON.parse(body) as { feedback: string; count: number };
+        const { feedback, count } = JSON.parse(body) as {
+          feedback: string;
+          count: number;
+        };
 
         if (count > 0) {
           const proc = Bun.spawn(["pbcopy"], { stdin: "pipe" });
           proc.stdin.write(feedback);
           proc.stdin.end();
           await proc.exited;
-          console.log(`\n✓ ${count} comment${count === 1 ? "" : "s"} copied to clipboard`);
+          console.log(
+            `\n✓ ${count} comment${count === 1 ? "" : "s"} copied to clipboard`,
+          );
         } else {
           console.log("\n(No comments — clipboard unchanged)");
         }
@@ -58,7 +65,10 @@ export async function startServer(content: string, filename: string) {
       }
 
       if (url.pathname === "/post" && req.method === "POST") {
-        const { feedback, count } = JSON.parse(await req.text()) as { feedback: string; count: number };
+        const { feedback, count } = JSON.parse(await req.text()) as {
+          feedback: string;
+          count: number;
+        };
 
         if (count > 0) {
           // Copy to clipboard via pbcopy
@@ -67,12 +77,18 @@ export async function startServer(content: string, filename: string) {
           proc.stdin.end();
           await proc.exited;
           // Print to stdout so Claude Code can read the feedback
-          process.stdout.write("\n=== md-review feedback ===\n" + feedback + "==========================\n");
+          process.stdout.write(
+            "\n=== md-review feedback ===\n" +
+              feedback +
+              "==========================\n",
+          );
           console.log(`✓ ${count} comment${count === 1 ? "" : "s"} posted`);
         }
 
         setTimeout(() => process.exit(0), 300);
-        return new Response("ok", { headers: { "Content-Type": "text/plain" } });
+        return new Response("ok", {
+          headers: { "Content-Type": "text/plain" },
+        });
       }
 
       return new Response("Not found", { status: 404 });

@@ -13,7 +13,11 @@ export default function Toolbar(props: ToolbarProps) {
   }
 
   async function handleCopy() {
-    const { feedback, count } = buildFeedback(comments, getGeneralText(), props.filename);
+    const { feedback, count } = buildFeedback(
+      comments,
+      getGeneralText(),
+      props.filename,
+    );
     try {
       await navigator.clipboard.writeText(feedback);
       props.onToast(count > 0 ? "Copied to clipboard" : "No comments to copy");
@@ -23,7 +27,11 @@ export default function Toolbar(props: ToolbarProps) {
   }
 
   async function handlePost() {
-    const { feedback, count } = buildFeedback(comments, getGeneralText(), props.filename);
+    const { feedback, count } = buildFeedback(
+      comments,
+      getGeneralText(),
+      props.filename,
+    );
     try {
       await fetch("/post", {
         method: "POST",
@@ -33,8 +41,7 @@ export default function Toolbar(props: ToolbarProps) {
     } catch {
       // Server may be gone
     }
-    document.body.innerHTML =
-      `<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:system-ui;color:#6b7280;font-size:14px;">Feedback posted. You can close this tab.</div>`;
+    document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:system-ui;color:#6b7280;font-size:14px;">Feedback posted. You can close this tab.</div>`;
     window.close();
   }
 

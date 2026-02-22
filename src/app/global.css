@@ -3,24 +3,47 @@
 /* ── Base ────────────────────────────────────── */
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   line-height: 1.6;
 }
 
 /* ── Prose styles for rendered markdown ──────── */
 
-#content-area h1 { @apply text-3xl font-bold mt-6 mb-2 leading-tight; }
-#content-area h2 { @apply text-2xl font-semibold mt-5 mb-2 leading-snug; }
-#content-area h3 { @apply text-xl font-semibold mt-5 mb-1.5; }
-#content-area h4 { @apply text-lg font-semibold mt-4 mb-1; }
-#content-area h5 { @apply text-base font-semibold mt-4 mb-1; }
-#content-area h6 { @apply text-sm font-semibold mt-3 mb-1; }
-#content-area p { @apply my-3; }
+#content-area h1 {
+  @apply text-3xl font-bold mt-6 mb-2 leading-tight;
+}
+#content-area h2 {
+  @apply text-2xl font-semibold mt-5 mb-2 leading-snug;
+}
+#content-area h3 {
+  @apply text-xl font-semibold mt-5 mb-1.5;
+}
+#content-area h4 {
+  @apply text-lg font-semibold mt-4 mb-1;
+}
+#content-area h5 {
+  @apply text-base font-semibold mt-4 mb-1;
+}
+#content-area h6 {
+  @apply text-sm font-semibold mt-3 mb-1;
+}
+#content-area p {
+  @apply my-3;
+}
 #content-area ul,
-#content-area ol { @apply my-3 pl-7; }
-#content-area li { @apply my-1; }
-#content-area li.task-list-item { @apply list-none -ml-6; }
-#content-area li.task-list-item input[type="checkbox"] { @apply mr-2 pointer-events-none; }
+#content-area ol {
+  @apply my-3 pl-7;
+}
+#content-area li {
+  @apply my-1;
+}
+#content-area li.task-list-item {
+  @apply list-none -ml-6;
+}
+#content-area li.task-list-item input[type="checkbox"] {
+  @apply mr-2 pointer-events-none;
+}
 
 #content-area blockquote {
   @apply border-l-[3px] border-neutral-300 dark:border-neutral-600 pl-4 py-1 my-3 text-neutral-500 dark:text-neutral-400;
@@ -43,22 +66,38 @@ body {
   @apply bg-transparent p-0 text-inherit;
 }
 
-#content-area table { @apply border-collapse w-full my-3; }
+#content-area table {
+  @apply border-collapse w-full my-3;
+}
 #content-area th,
 #content-area td {
   @apply border border-neutral-200 dark:border-neutral-700 px-3 py-2 text-left;
 }
-#content-area th { @apply bg-neutral-50 dark:bg-neutral-800 font-semibold; }
+#content-area th {
+  @apply bg-neutral-50 dark:bg-neutral-800 font-semibold;
+}
 
-#content-area hr { @apply border-none border-t border-neutral-200 dark:border-neutral-700 my-6; }
-#content-area img { @apply max-w-full rounded-md; }
-#content-area a { @apply text-blue-600 dark:text-blue-400 no-underline hover:underline; }
+#content-area hr {
+  @apply border-none border-t border-neutral-200 dark:border-neutral-700 my-6;
+}
+#content-area img {
+  @apply max-w-full rounded-md;
+}
+#content-area a {
+  @apply text-blue-600 dark:text-blue-400 no-underline hover:underline;
+}
 
 /* ── Mermaid ─────────────────────────────────── */
 
-.mermaid-container { @apply my-3 overflow-x-auto; }
-.mermaid-container svg { @apply max-w-full h-auto; }
-.mermaid-source { @apply hidden; }
+.mermaid-container {
+  @apply my-3 overflow-x-auto;
+}
+.mermaid-container svg {
+  @apply max-w-full h-auto;
+}
+.mermaid-source {
+  @apply hidden;
+}
 
 /* ── Annotatable blocks ──────────────────────── */
 

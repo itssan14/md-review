@@ -22,7 +22,9 @@ export default function MarginComment(props: MarginCommentProps) {
   };
 
   function scrollToBlock() {
-    const target = document.querySelector(`[data-start-line="${props.comment.startLine}"]`);
+    const target = document.querySelector(
+      `[data-start-line="${props.comment.startLine}"]`,
+    );
     if (target) target.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
@@ -34,7 +36,10 @@ export default function MarginComment(props: MarginCommentProps) {
   }
 
   function handleEditKeyDown(e: KeyboardEvent) {
-    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); saveEdit(); }
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      saveEdit();
+    }
     if (e.key === "Escape") setEditing(false);
   }
 
@@ -66,7 +71,10 @@ export default function MarginComment(props: MarginCommentProps) {
         fallback={
           <div class="px-3 pb-2.5">
             <textarea
-              ref={(el) => { editRef = el; setTimeout(() => el.focus(), 0); }}
+              ref={(el) => {
+                editRef = el;
+                setTimeout(() => el.focus(), 0);
+              }}
               class="w-full text-sm px-2.5 py-2 border border-blue-400 dark:border-blue-600 rounded-lg resize-none min-h-[48px] outline-none bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:border-blue-600"
               value={props.comment.text}
               rows={2}

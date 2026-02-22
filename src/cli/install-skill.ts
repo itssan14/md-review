@@ -16,8 +16,12 @@ export async function installSkill() {
 
   console.log(`✓ Skill installed to ${destPath}`);
   console.log();
-  console.log("Claude Code will now know how to use md-review for document reviews.");
+  console.log(
+    "Claude Code will now know how to use md-review for document reviews.",
+  );
   console.log();
   console.log("For Cursor / Copilot, add to your .cursorrules:");
-  console.log('  "When asked to review a markdown document, use `md-review <file>` to open it in the browser for annotation."');
+  console.log(
+    '  "When asked to review a markdown document, use `md-review <file>` to open it in the browser for annotation."',
+  );
 }

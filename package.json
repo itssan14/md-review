@@ -7,7 +7,11 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build"
+    "build": "vite build",
+    "lint": "oxlint src",
+    "lint:fix": "oxlint --fix src",
+    "format": "oxfmt src",
+    "format:check": "oxfmt --check src"
   },
   "dependencies": {
     "solid-js": "^1.9.5",
@@ -15,12 +19,14 @@
     "highlight.js": "^11.11.1"
   },
   "devDependencies": {
-    "@types/bun": "latest",
-    "vite": "^6.3.5",
-    "vite-plugin-solid": "^2.11.6",
     "@tailwindcss/vite": "^4.1.7",
+    "@types/bun": "latest",
+    "oxfmt": "^0.34.0",
+    "oxlint": "^1.49.0",
     "tailwindcss": "^4.1.7",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5",
     "vite-plugin-singlefile": "^2.0.3",
-    "typescript": "^5.8.3"
+    "vite-plugin-solid": "^2.11.6"
   }
 }
