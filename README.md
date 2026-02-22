@@ -7,11 +7,29 @@ clipboard.
 
 ## Install
 
-Clone and build:
+### With Bun
+
+Clone, build, and link globally:
 
 ```sh
 git clone <repo-url> && cd md-review
 bun install && bun run build
+bun link
+```
+
+`bun link` adds `md-review` to `~/.bun/bin/`, making it available from any
+directory. Ensure `~/.bun/bin` is in your `PATH` (the Bun installer adds this
+automatically):
+
+```sh
+# Verify it's on your PATH
+which md-review
+```
+
+To uninstall:
+
+```sh
+bun unlink md-review
 ```
 
 ## Usage
