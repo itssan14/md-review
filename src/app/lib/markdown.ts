@@ -23,12 +23,13 @@ export function configureMarked() {
         return `<pre><code${langClass}>${escapeForHTML(text)}</code></pre>`;
       },
       listitem(item: Tokens.ListItem) {
-        const { text, task, checked } = item;
+        const { task, checked } = item;
+        const body = (this as any).parser.parse(item.tokens, !!item.loose);
         if (task) {
           const checkbox = `<input type="checkbox"${checked ? " checked" : ""} disabled> `;
-          return `<li class="task-list-item">${checkbox}${text}</li>\n`;
+          return `<li class="task-list-item">${checkbox}${body}</li>\n`;
         }
-        return `<li>${text}</li>\n`;
+        return `<li>${body}</li>\n`;
       },
     },
   });
