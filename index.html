@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>md-review</title>
+</head>
+<body>
+  <script id="md-review-data" type="application/json">__MD_REVIEW_DATA__</script>
+  <div id="root"></div>
+  <script type="module" src="/src/app/index.tsx"></script>
+
+  <!-- Mermaid from CDN — too large (~2MB) to inline -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    mermaid.initialize({ startOnLoad: false, theme: prefersDark ? 'dark' : 'default' });
+    window.__mermaid = mermaid;
+    window.dispatchEvent(new Event('mermaid-ready'));
+  </script>
+</body>
+</html>
