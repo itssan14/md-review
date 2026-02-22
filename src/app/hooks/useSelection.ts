@@ -1,5 +1,5 @@
 import { createSignal, onCleanup } from "solid-js";
-import { findAnnotatableAncestor } from "../lib/selection";
+import { findAnnotatableAncestor, getIntAttr } from "../lib/selection";
 
 export interface PendingSelection {
   startLine: number;
@@ -36,10 +36,10 @@ export function useSelection(contentAreaRef: () => HTMLElement | undefined) {
       return;
     }
 
-    const aStart = parseInt(anchorBlock.getAttribute("data-start-line")!, 10);
-    const aEnd = parseInt(anchorBlock.getAttribute("data-end-line")!, 10);
-    const fStart = parseInt(focusBlock.getAttribute("data-start-line")!, 10);
-    const fEnd = parseInt(focusBlock.getAttribute("data-end-line")!, 10);
+    const aStart = getIntAttr(anchorBlock, "data-start-line");
+    const aEnd = getIntAttr(anchorBlock, "data-end-line");
+    const fStart = getIntAttr(focusBlock, "data-start-line");
+    const fEnd = getIntAttr(focusBlock, "data-end-line");
 
     const startLine = Math.min(aStart, fStart);
     const endLine = Math.max(aEnd, fEnd);

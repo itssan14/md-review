@@ -7,6 +7,7 @@ import {
 import { buildLineMap, matchBlockToMap } from "../lib/line-map";
 import { waitForMermaid, renderMermaidBlocks } from "../lib/mermaid";
 import { useSelection } from "../hooks/useSelection";
+import { getIntAttr } from "../lib/selection";
 import { comments } from "../stores/comments";
 import FloatingCommentBtn from "./FloatingCommentBtn";
 
@@ -73,7 +74,7 @@ export default function ContentArea(props: ContentAreaProps) {
         const blocks = areaRef.querySelectorAll("[data-start-line]");
         const commentedLines = new Set(comments.map((c) => c.startLine));
         blocks.forEach((block) => {
-          const line = parseInt(block.getAttribute("data-start-line")!, 10);
+          const line = getIntAttr(block, "data-start-line");
           block.classList.toggle("has-comment", commentedLines.has(line));
         });
       },
@@ -97,8 +98,8 @@ export default function ContentArea(props: ContentAreaProps) {
   function highlightRange(startLine: number, endLine: number) {
     clearRangeSelection();
     areaRef.querySelectorAll("[data-start-line]").forEach((block) => {
-      const bStart = parseInt(block.getAttribute("data-start-line")!, 10);
-      const bEnd = parseInt(block.getAttribute("data-end-line")!, 10);
+      const bStart = getIntAttr(block, "data-start-line");
+      const bEnd = getIntAttr(block, "data-end-line");
       if (bStart >= startLine && bEnd <= endLine) {
         block.classList.add("range-selected");
       }

@@ -40,7 +40,7 @@ export default function App() {
   );
 
   let contentAreaEl: HTMLElement | undefined;
-  let containerEl: HTMLElement | undefined;
+  let containerEl: HTMLDivElement | undefined;
   let generalTextEl: HTMLTextAreaElement | undefined;
   let marginListEl: HTMLElement | undefined;
   let clearRangeSelectionFn: (() => void) | undefined;
