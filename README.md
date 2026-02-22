@@ -5,6 +5,8 @@ Browser-based markdown annotation tool with Google Docs-style margin comments.
 Select text, add comments, click "Done & Copy" — feedback is copied to
 clipboard.
 
+![Demo](demo/demo.mp4)
+
 ## Install
 
 ### With Bun
