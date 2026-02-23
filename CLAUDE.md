@@ -24,7 +24,20 @@ bun run build && bun link               # Build + link globally
 bun unlink md-review                    # Uninstall
 ```
 
-There are no tests.
+```sh
+bun test                 # Run all tests
+bun test --watch         # Watch mode during development
+```
+
+```sh
+bun run typecheck        # TypeScript type checking
+bun run lint             # Lint with oxlint
+bun run lint:fix         # Auto-fix lint issues
+bun run format           # Format with oxfmt
+bun run format:check     # Check formatting without writing
+```
+
+Test files are colocated with source: `src/app/lib/*.test.ts`. No build step required — Bun transpiles TypeScript directly.
 
 ## Architecture
 
@@ -40,6 +53,7 @@ This is a two-part project: a **Bun CLI/server** and a **SolidJS single-page app
 - `server.ts` — Bun HTTP server on port 3849+ (auto-increments to find a free port); injects markdown data into `dist/index.html`; exposes two POST endpoints:
   - `/done` — copies feedback to clipboard via `pbcopy`, server stays alive
   - `/post` — copies to clipboard, prints feedback to stdout (for agent piping), then exits after 300ms
+  > **Note:** `pbcopy` is macOS-only. On other platforms, clipboard copy will silently fail.
 - `install-skill.ts` — Copies `src/skills/claude-skill.md` to `~/.claude/skills/md-review.md`
 
 ### Frontend (`src/app/`)
@@ -62,6 +76,7 @@ SolidJS app with Tailwind CSS v4. Data flows from the injected JSON → `App.tsx
 - `ContentArea` — markdown render + selection handling
 - `MarginCommentList` — manages layout of all margin comments
 - `MarginComment` — individual comment card (view/edit/delete)
+- `FloatingCommentBtn` — floating "Comment" button that appears above text selection, triggers CommentForm
 - `CommentForm` — new comment input form (appears in margin at selection position)
 - `GeneralComment` — unanchored textarea at bottom of content column
 - `Toolbar` — fixed bottom bar with "Done & Copy" and "Post" buttons + filename display
