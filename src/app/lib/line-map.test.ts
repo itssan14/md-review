@@ -7,11 +7,23 @@ describe("buildLineMap: headings", () => {
   test("h1 produces a heading entry on the correct line", () => {
     const map = buildLineMap("# Title");
     expect(map).toHaveLength(1);
-    expect(map[0]).toMatchObject({ type: "heading", startLine: 1, endLine: 1, text: "Title" });
+    expect(map[0]).toMatchObject({
+      type: "heading",
+      startLine: 1,
+      endLine: 1,
+      text: "Title",
+    });
   });
 
   test("all heading levels 1-6 are detected as heading type", () => {
-    const src = ["# H1", "## H2", "### H3", "#### H4", "##### H5", "###### H6"].join("\n");
+    const src = [
+      "# H1",
+      "## H2",
+      "### H3",
+      "#### H4",
+      "##### H5",
+      "###### H6",
+    ].join("\n");
     const map = buildLineMap(src);
     expect(map).toHaveLength(6);
     map.forEach((entry) => expect(entry.type).toBe("heading"));
@@ -36,14 +48,22 @@ describe("buildLineMap: paragraphs", () => {
   test("single-line paragraph spans one line", () => {
     const map = buildLineMap("Hello world");
     expect(map).toHaveLength(1);
-    expect(map[0]).toMatchObject({ type: "paragraph", startLine: 1, endLine: 1 });
+    expect(map[0]).toMatchObject({
+      type: "paragraph",
+      startLine: 1,
+      endLine: 1,
+    });
   });
 
   test("multi-line paragraph spans all its lines", () => {
     const src = "line one\nline two\nline three";
     const map = buildLineMap(src);
     expect(map).toHaveLength(1);
-    expect(map[0]).toMatchObject({ type: "paragraph", startLine: 1, endLine: 3 });
+    expect(map[0]).toMatchObject({
+      type: "paragraph",
+      startLine: 1,
+      endLine: 3,
+    });
   });
 
   test("multi-line paragraph text is concatenated with spaces", () => {
@@ -177,7 +197,11 @@ describe("buildLineMap: blockquotes", () => {
     const src = "> line one\n> line two\n> line three";
     const map = buildLineMap(src);
     expect(map).toHaveLength(1);
-    expect(map[0]).toMatchObject({ type: "blockquote", startLine: 1, endLine: 3 });
+    expect(map[0]).toMatchObject({
+      type: "blockquote",
+      startLine: 1,
+      endLine: 3,
+    });
   });
 
   test("blockquote text is the first line content stripped of > prefix", () => {
@@ -224,20 +248,20 @@ describe("buildLineMap: blank lines", () => {
 describe("buildLineMap: mixed content", () => {
   test("realistic document produces entries in source order with correct types", () => {
     const src = [
-      "# Introduction",       // line 1  → heading
-      "",                      // line 2  → blank
-      "Some paragraph text.",  // line 3  → paragraph
-      "",                      // line 4  → blank
-      "- item a",              // line 5  → list
-      "- item b",              // line 6
-      "",                      // line 7  → blank
-      "```js",                 // line 8  → code
-      "const x = 1;",          // line 9
-      "```",                   // line 10
-      "",                      // line 11 → blank
-      "> a quote",             // line 12 → blockquote
-      "",                      // line 13 → blank
-      "---",                   // line 14 → hr
+      "# Introduction", // line 1  → heading
+      "", // line 2  → blank
+      "Some paragraph text.", // line 3  → paragraph
+      "", // line 4  → blank
+      "- item a", // line 5  → list
+      "- item b", // line 6
+      "", // line 7  → blank
+      "```js", // line 8  → code
+      "const x = 1;", // line 9
+      "```", // line 10
+      "", // line 11 → blank
+      "> a quote", // line 12 → blockquote
+      "", // line 13 → blank
+      "---", // line 14 → hr
     ].join("\n");
 
     const map = buildLineMap(src);

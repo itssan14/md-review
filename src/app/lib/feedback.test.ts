@@ -23,7 +23,9 @@ describe("escapeForHTML", () => {
   });
 
   test("escapes all special chars in one string", () => {
-    expect(escapeForHTML('a & <b> "c"')).toBe("a &amp; &lt;b&gt; &quot;c&quot;");
+    expect(escapeForHTML('a & <b> "c"')).toBe(
+      "a &amp; &lt;b&gt; &quot;c&quot;",
+    );
   });
 });
 
@@ -35,7 +37,13 @@ describe("buildFeedback", () => {
 
   test("single-line comment uses L<n> reference", () => {
     const comments = [
-      { id: "1", startLine: 5, endLine: 5, context: "some text", text: "looks good" },
+      {
+        id: "1",
+        startLine: 5,
+        endLine: 5,
+        context: "some text",
+        text: "looks good",
+      },
     ];
     const { feedback } = buildFeedback(comments, "", "doc.md");
     expect(feedback).toContain("L5 [some text]: looks good");
@@ -43,7 +51,13 @@ describe("buildFeedback", () => {
 
   test("multi-line comment uses L<start>-<end> reference", () => {
     const comments = [
-      { id: "1", startLine: 3, endLine: 7, context: "a paragraph", text: "rewrite this" },
+      {
+        id: "1",
+        startLine: 3,
+        endLine: 7,
+        context: "a paragraph",
+        text: "rewrite this",
+      },
     ];
     const { feedback } = buildFeedback(comments, "", "doc.md");
     expect(feedback).toContain("L3-7 [a paragraph]: rewrite this");
