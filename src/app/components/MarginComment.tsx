@@ -5,6 +5,7 @@ import type { Comment } from "../lib/feedback";
 interface MarginCommentProps {
   comment: Comment;
   top: number;
+  "data-margin-card"?: string;
 }
 
 export default function MarginComment(props: MarginCommentProps) {
@@ -45,6 +46,7 @@ export default function MarginComment(props: MarginCommentProps) {
 
   return (
     <div
+      data-margin-card={props["data-margin-card"]}
       class="group absolute w-full bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700 rounded-xl shadow-sm hover:shadow-md transition-[top,box-shadow] duration-150 overflow-hidden"
       style={{ top: `${props.top}px` }}
     >
