@@ -92,7 +92,7 @@ export default function MarginCommentList(props: MarginCommentListProps) {
   // Recompute on comment changes
   createEffect(
     on(
-      () => comments.map((c) => `${c.id}:${c.startLine}`).join(","),
+      () => comments.map((c) => `${c.id}:${c.startLine}:${c.text}`).join(","),
       () => requestAnimationFrame(recomputePositions),
     ),
   );
@@ -121,9 +121,11 @@ export default function MarginCommentList(props: MarginCommentListProps) {
     >
       <For each={[...comments].sort((a, b) => a.startLine - b.startLine)}>
         {(comment) => (
-          <div data-margin-card={comment.id}>
-            <MarginComment comment={comment} top={getTop(comment.id)} />
-          </div>
+          <MarginComment
+            data-margin-card={comment.id}
+            comment={comment}
+            top={getTop(comment.id)}
+          />
         )}
       </For>
       <Show when={props.pendingForm?.()}>
