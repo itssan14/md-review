@@ -1,4 +1,5 @@
 import { createSignal, createEffect, onMount, onCleanup, Show } from "solid-js";
+import { File } from "lucide-solid";
 import { useSystemTheme } from "./hooks/useSystemTheme";
 import { reinitMermaid } from "./lib/mermaid";
 import ContentArea from "./components/ContentArea";
@@ -70,6 +71,38 @@ export default function App() {
   let marginListEl: HTMLElement | undefined;
   let clearRangeSelectionFn: (() => void) | undefined;
 
+  // Sidebar resize
+  const MIN_SIDEBAR = 160;
+  const MAX_SIDEBAR = 600;
+  const [sidebarWidth, setSidebarWidth] = createSignal(256);
+  let dragStartX = 0;
+  let dragStartWidth = 0;
+
+  function onSidebarDragStart(e: MouseEvent) {
+    dragStartX = e.clientX;
+    dragStartWidth = sidebarWidth();
+    document.addEventListener("mousemove", onSidebarDragMove);
+    document.addEventListener("mouseup", onSidebarDragEnd);
+    e.preventDefault();
+  }
+
+  function onSidebarDragMove(e: MouseEvent) {
+    const delta = e.clientX - dragStartX;
+    setSidebarWidth(
+      Math.max(MIN_SIDEBAR, Math.min(MAX_SIDEBAR, dragStartWidth + delta)),
+    );
+  }
+
+  function onSidebarDragEnd() {
+    document.removeEventListener("mousemove", onSidebarDragMove);
+    document.removeEventListener("mouseup", onSidebarDragEnd);
+  }
+
+  onCleanup(() => {
+    document.removeEventListener("mousemove", onSidebarDragMove);
+    document.removeEventListener("mouseup", onSidebarDragEnd);
+  });
+
   // Inject highlight.js theme styles
   onMount(() => {
     const lightStyle = document.createElement("style");
@@ -103,15 +136,50 @@ export default function App() {
     }
   });
 
-  // Folder mode: auto-open first file on mount
+  // Folder mode: loaded markdown for current file
+  const [loadedMarkdown, setLoadedMarkdown] = createSignal("");
+  const [isLoading, setIsLoading] = createSignal(false);
+
   if (data.type === "folder") {
+    // Auto-open first file on mount
     onMount(() => {
       if (!activeFile()) {
         const first = findFirstFile(data.tree);
         if (first) setActiveFile(first);
       }
     });
+
+    // Load file content when activeFile changes
+    createEffect(() => {
+      const path = activeFile();
+      if (!path) return;
+      const controller = new AbortController();
+      setIsLoading(true);
+      fetch(`/file?path=${encodeURIComponent(path)}`, {
+        signal: controller.signal,
+      })
+        .then((res) => res.json())
+        .then((json: { rawMarkdown: string }) =>
+          setLoadedMarkdown(json.rawMarkdown),
+        )
+        .catch((err: Error) => {
+          if (err.name !== "AbortError") console.error(err);
+        })
+        .finally(() => setIsLoading(false));
+      onCleanup(() => controller.abort());
+    });
   }
+
+  // Derived: the key that identifies the current file.
+  // File mode: constant filename — content never needs recreating.
+  // Folder mode: activeFile() — changing it destroys/recreates ContentArea.
+  const contentKey = () =>
+    data.type === "file" ? data.filename : activeFile();
+
+  const currentMarkdown = () =>
+    data.type === "file" ? data.rawMarkdown : loadedMarkdown();
+
+  const contentLoading = () => data.type === "folder" && isLoading();
 
   function handleCommentRequest({
     block,
@@ -132,107 +200,6 @@ export default function App() {
     clearRangeSelectionFn?.();
   }
 
-  // ── File mode ────────────────────────────────────────────────────────────
-  if (data.type === "file") {
-    const { rawMarkdown, filename } = data;
-    return (
-      <div
-        ref={containerEl}
-        class="min-h-screen bg-stone-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100"
-      >
-        <div class="max-w-[1200px] mx-auto grid grid-cols-[1fr_320px]">
-          {/* Content column */}
-          <div class="max-w-[840px]">
-            <ContentArea
-              rawMarkdown={rawMarkdown}
-              filename={filename}
-              contentRef={(el) => (contentAreaEl = el)}
-              containerRef={() => containerEl}
-              onCommentRequest={handleCommentRequest}
-              onClearRangeRef={(fn) => (clearRangeSelectionFn = fn)}
-            />
-            <GeneralComment textRef={(el) => (generalTextEl = el)} />
-          </div>
-
-          {/* Margin column */}
-          <div class="pt-12">
-            <MarginCommentList
-              filename={filename}
-              contentAreaRef={() => contentAreaEl}
-              containerRef={() => containerEl}
-              listRef={(el) => (marginListEl = el)}
-              pendingForm={pendingForm}
-              onFormClose={handleFormClose}
-            />
-          </div>
-        </div>
-
-        <Toolbar
-          mode="file"
-          filename={filename}
-          generalTextRef={() => generalTextEl}
-          onToast={setToastMsg}
-        />
-        <Toast message={toastMsg} onDismiss={() => setToastMsg("")} />
-      </div>
-    );
-  }
-
-  // ── Folder mode ───────────────────────────────────────────────────────────
-  const { folderName, tree } = data;
-
-  // Folder mode: loaded markdown for current file
-  const [loadedMarkdown, setLoadedMarkdown] = createSignal("");
-  const [isLoading, setIsLoading] = createSignal(false);
-
-  // Folder mode: load file content when activeFile changes
-  createEffect(() => {
-    const path = activeFile();
-    if (!path) return;
-    const controller = new AbortController();
-    setIsLoading(true);
-    fetch(`/file?path=${encodeURIComponent(path)}`, { signal: controller.signal })
-      .then((res) => res.json())
-      .then((json: { rawMarkdown: string }) => setLoadedMarkdown(json.rawMarkdown))
-      .catch((err: Error) => {
-        if (err.name !== "AbortError") console.error(err);
-      })
-      .finally(() => setIsLoading(false));
-    onCleanup(() => controller.abort());
-  });
-
-  const MIN_SIDEBAR = 160;
-  const MAX_SIDEBAR = 600;
-  const [sidebarWidth, setSidebarWidth] = createSignal(256);
-
-  let dragStartX = 0;
-  let dragStartWidth = 0;
-
-  function onSidebarDragStart(e: MouseEvent) {
-    dragStartX = e.clientX;
-    dragStartWidth = sidebarWidth();
-    document.addEventListener("mousemove", onSidebarDragMove);
-    document.addEventListener("mouseup", onSidebarDragEnd);
-    e.preventDefault();
-  }
-
-  function onSidebarDragMove(e: MouseEvent) {
-    const delta = e.clientX - dragStartX;
-    setSidebarWidth(
-      Math.max(MIN_SIDEBAR, Math.min(MAX_SIDEBAR, dragStartWidth + delta)),
-    );
-  }
-
-  function onSidebarDragEnd() {
-    document.removeEventListener("mousemove", onSidebarDragMove);
-    document.removeEventListener("mouseup", onSidebarDragEnd);
-  }
-
-  onCleanup(() => {
-    document.removeEventListener("mousemove", onSidebarDragMove);
-    document.removeEventListener("mouseup", onSidebarDragEnd);
-  });
-
   return (
     <div
       ref={containerEl}
@@ -243,19 +210,37 @@ export default function App() {
         class="h-full border-r border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 flex flex-col flex-shrink-0 relative"
         style={{ width: `${sidebarWidth()}px` }}
       >
-        <div class="flex-1 overflow-y-auto overflow-x-auto">
-          <FileSidebar tree={tree} rootName={folderName} />
-        </div>
+        {data.type === "folder" ? (
+          <div class="flex-1 overflow-y-auto overflow-x-auto">
+            <FileSidebar tree={data.tree} rootName={data.folderName} />
+          </div>
+        ) : (
+          <div class="flex-1 py-2">
+            <div
+              class="flex items-center gap-1.5 py-1 pr-3 text-sm border-l-2 border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-medium"
+              style={{ "padding-left": "6px" }}
+            >
+              <File size={13} stroke-width={1.5} class="flex-shrink-0" />
+              <span class="truncate">{data.filename}</span>
+            </div>
+          </div>
+        )}
+
         {/* General comment */}
         <div class="px-2 py-2 border-t border-neutral-200 dark:border-neutral-700">
-          <GeneralComment compact defaultExpanded textRef={(el) => (generalTextEl = el)} />
+          <GeneralComment
+            compact
+            defaultExpanded
+            textRef={(el) => (generalTextEl = el)}
+          />
         </div>
 
         {/* Inline toolbar */}
         <Toolbar
           variant="inline"
-          mode="folder"
-          folderName={folderName}
+          mode={data.type}
+          filename={data.type === "file" ? data.filename : undefined}
+          folderName={data.type === "folder" ? data.folderName : undefined}
           generalTextRef={() => generalTextEl}
           onToast={setToastMsg}
         />
@@ -267,56 +252,55 @@ export default function App() {
         />
       </div>
 
-      {/* Main panel */}
-      <div class="flex-1 overflow-hidden grid grid-cols-[1fr_320px] min-w-0 h-full">
-        {/* Content column */}
-        <div class="overflow-y-auto overflow-x-auto h-full min-w-0">
-          <Show
-            when={activeFile()}
-            keyed
-            fallback={
-              <div class="flex items-center justify-center h-64 text-neutral-400 dark:text-neutral-500 text-sm">
-                Select a file to review
-              </div>
-            }
-          >
-            {(filename) => (
-              <Show
-                when={!isLoading()}
-                fallback={
-                  <div class="px-10 pt-12 text-neutral-400 text-sm">
-                    Loading…
-                  </div>
-                }
-              >
-                <ContentArea
-                  rawMarkdown={loadedMarkdown()}
-                  filename={filename}
-                  contentRef={(el) => (contentAreaEl = el)}
+      {/* Main panel — single scrollable column; margin notes float as an absolute overlay */}
+      <div class="flex-1 overflow-hidden min-w-0 h-full">
+        <div class="h-full overflow-y-auto overflow-x-auto">
+          <div class="relative">
+            <Show
+              when={contentKey()}
+              keyed
+              fallback={
+                <div class="flex items-center justify-center h-64 text-neutral-400 dark:text-neutral-500 text-sm">
+                  Select a file to review
+                </div>
+              }
+            >
+              {(filename) => (
+                <Show
+                  when={!contentLoading()}
+                  fallback={
+                    <div class="px-10 pt-12 text-neutral-400 text-sm">
+                      Loading…
+                    </div>
+                  }
+                >
+                  <ContentArea
+                    rawMarkdown={currentMarkdown()}
+                    filename={filename}
+                    contentRef={(el) => (contentAreaEl = el)}
+                    containerRef={() => containerEl}
+                    onCommentRequest={handleCommentRequest}
+                    onClearRangeRef={(fn) => (clearRangeSelectionFn = fn)}
+                  />
+                </Show>
+              )}
+            </Show>
+
+            {/* Margin notes: absolute overlay, scrolls with content, no reserved space */}
+            <div class="absolute right-0 top-0 w-72 pr-3 pointer-events-none">
+              {/* Not keyed: MarginCommentList filters by filename prop reactively */}
+              <Show when={contentKey()}>
+                <MarginCommentList
+                  filename={contentKey()!}
+                  contentAreaRef={() => contentAreaEl}
                   containerRef={() => containerEl}
-                  onCommentRequest={handleCommentRequest}
-                  onClearRangeRef={(fn) => (clearRangeSelectionFn = fn)}
+                  listRef={(el) => (marginListEl = el)}
+                  pendingForm={pendingForm}
+                  onFormClose={handleFormClose}
                 />
               </Show>
-            )}
-          </Show>
-        </div>
-
-        {/* Margin column */}
-        <div class="pt-12 overflow-y-auto h-full pr-3">
-          {/* Not keyed: MarginCommentList filters by filename prop reactively — no need to destroy/recreate on file switch */}
-          <Show when={activeFile()}>
-            {(filename) => (
-              <MarginCommentList
-                filename={filename()}
-                contentAreaRef={() => contentAreaEl}
-                containerRef={() => containerEl}
-                listRef={(el) => (marginListEl = el)}
-                pendingForm={pendingForm}
-                onFormClose={handleFormClose}
-              />
-            )}
-          </Show>
+            </div>
+          </div>
         </div>
       </div>
 
