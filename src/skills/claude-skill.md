@@ -1,3 +1,8 @@
+---
+name: md-review
+description: Use when the user asks to review, annotate, or give feedback on a markdown file.
+---
+
 # md-review — Markdown Document Review
 
 ## When to use
@@ -31,9 +36,3 @@ General: Overall the document is well-structured but needs more examples.
 ```
 
 The server stays running so the user can continue editing comments. The CLI prints a confirmation when feedback is copied.
-
-## Installation
-
-```bash
-md-review install-skill
-```

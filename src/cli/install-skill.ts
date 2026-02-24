@@ -4,8 +4,8 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 export async function installSkill() {
   const skillSource = resolve(import.meta.dir, "../skills/claude-skill.md");
   const homeDir = process.env.HOME || process.env.USERPROFILE || "~";
-  const skillsDir = resolve(homeDir, ".claude/skills");
-  const destPath = resolve(skillsDir, "md-review.md");
+  const skillsDir = resolve(homeDir, ".claude/skills/md-review");
+  const destPath = resolve(skillsDir, "SKILL.md");
 
   if (!existsSync(skillsDir)) {
     mkdirSync(skillsDir, { recursive: true });
