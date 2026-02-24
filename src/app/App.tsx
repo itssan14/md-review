@@ -1,4 +1,4 @@
-import { createSignal, createEffect, onMount, Show } from "solid-js";
+import { createSignal, createEffect, onMount, onCleanup, Show } from "solid-js";
 import { useSystemTheme } from "./hooks/useSystemTheme";
 import { reinitMermaid } from "./lib/mermaid";
 import ContentArea from "./components/ContentArea";
@@ -201,25 +201,76 @@ export default function App() {
   // ── Folder mode ───────────────────────────────────────────────────────────
   const { folderName, tree } = data;
 
+  const MIN_SIDEBAR = 160;
+  const MAX_SIDEBAR = 600;
+  const [sidebarWidth, setSidebarWidth] = createSignal(256);
+
+  let dragStartX = 0;
+  let dragStartWidth = 0;
+
+  function onSidebarDragStart(e: MouseEvent) {
+    dragStartX = e.clientX;
+    dragStartWidth = sidebarWidth();
+    document.addEventListener("mousemove", onSidebarDragMove);
+    document.addEventListener("mouseup", onSidebarDragEnd);
+    e.preventDefault();
+  }
+
+  function onSidebarDragMove(e: MouseEvent) {
+    const delta = e.clientX - dragStartX;
+    setSidebarWidth(
+      Math.max(MIN_SIDEBAR, Math.min(MAX_SIDEBAR, dragStartWidth + delta)),
+    );
+  }
+
+  function onSidebarDragEnd() {
+    document.removeEventListener("mousemove", onSidebarDragMove);
+    document.removeEventListener("mouseup", onSidebarDragEnd);
+  }
+
+  onCleanup(() => {
+    document.removeEventListener("mousemove", onSidebarDragMove);
+    document.removeEventListener("mouseup", onSidebarDragEnd);
+  });
+
   return (
     <div
       ref={containerEl}
       class="h-screen overflow-hidden bg-stone-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 flex"
     >
       {/* Sidebar */}
-      <div class="w-64 h-full pb-14 border-r border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 flex flex-col flex-shrink-0">
-        <div class="flex-1 overflow-y-auto">
+      <div
+        class="h-full border-r border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 flex flex-col flex-shrink-0 relative"
+        style={{ width: `${sidebarWidth()}px` }}
+      >
+        <div class="flex-1 overflow-y-auto overflow-x-auto">
           <FileSidebar tree={tree} rootName={folderName} />
         </div>
-        <div class="px-2 py-2">
-          <GeneralComment compact textRef={(el) => (generalTextEl = el)} />
+        {/* General comment */}
+        <div class="px-2 py-2 border-t border-neutral-200 dark:border-neutral-700">
+          <GeneralComment compact defaultExpanded textRef={(el) => (generalTextEl = el)} />
         </div>
+
+        {/* Inline toolbar */}
+        <Toolbar
+          variant="inline"
+          mode="folder"
+          folderName={folderName}
+          generalTextRef={() => generalTextEl}
+          onToast={setToastMsg}
+        />
+
+        {/* Resize handle */}
+        <div
+          class="absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-blue-400/40 active:bg-blue-500/50 transition-colors z-10"
+          onMouseDown={onSidebarDragStart}
+        />
       </div>
 
       {/* Main panel */}
       <div class="flex-1 overflow-hidden grid grid-cols-[1fr_320px] min-w-0 h-full">
         {/* Content column */}
-        <div class="overflow-y-auto overflow-x-auto h-full pb-16 min-w-0">
+        <div class="overflow-y-auto overflow-x-auto h-full min-w-0">
           <Show
             when={activeFile()}
             keyed
@@ -252,7 +303,7 @@ export default function App() {
         </div>
 
         {/* Margin column */}
-        <div class="pt-12 overflow-y-auto h-full pb-16 pr-3">
+        <div class="pt-12 overflow-y-auto h-full pr-3">
           <Show when={activeFile()}>
             {(filename) => (
               <MarginCommentList
@@ -268,12 +319,6 @@ export default function App() {
         </div>
       </div>
 
-      <Toolbar
-        mode="folder"
-        folderName={folderName}
-        generalTextRef={() => generalTextEl}
-        onToast={setToastMsg}
-      />
       <Toast message={toastMsg} onDismiss={() => setToastMsg("")} />
     </div>
   );

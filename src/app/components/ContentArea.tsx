@@ -121,7 +121,7 @@ export default function ContentArea(props: ContentAreaProps) {
 
   return (
     <div class="relative">
-      <div ref={areaRef} id="content-area" class="px-10 pt-12 pb-32" />
+      <div ref={areaRef} id="content-area" class="pl-10 pr-80 pt-12 pb-32" />
 
       <FloatingCommentBtn
         pending={pending}

@@ -121,7 +121,7 @@ export default function MarginCommentList(props: MarginCommentListProps) {
   return (
     <div
       data-margin-list
-      class="relative"
+      class="relative pointer-events-auto"
       ref={(el) => {
         listEl = el;
         props.listRef?.(el);

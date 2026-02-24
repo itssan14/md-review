@@ -3,10 +3,11 @@ import { createSignal, Show } from "solid-js";
 interface GeneralCommentProps {
   textRef: (el: HTMLTextAreaElement) => void;
   compact?: boolean;
+  defaultExpanded?: boolean;
 }
 
 export default function GeneralComment(props: GeneralCommentProps) {
-  const [expanded, setExpanded] = createSignal(false);
+  const [expanded, setExpanded] = createSignal(props.defaultExpanded ?? false);
 
   if (props.compact) {
     return (
