@@ -70,10 +70,6 @@ export default function App() {
   let marginListEl: HTMLElement | undefined;
   let clearRangeSelectionFn: (() => void) | undefined;
 
-  // Folder mode: loaded markdown for current file
-  const [loadedMarkdown, setLoadedMarkdown] = createSignal("");
-  const [isLoading, setIsLoading] = createSignal(false);
-
   // Inject highlight.js theme styles
   onMount(() => {
     const lightStyle = document.createElement("style");
@@ -113,22 +109,6 @@ export default function App() {
       if (!activeFile()) {
         const first = findFirstFile(data.tree);
         if (first) setActiveFile(first);
-      }
-    });
-  }
-
-  // Folder mode: load file content when activeFile changes
-  if (data.type === "folder") {
-    createEffect(async () => {
-      const path = activeFile();
-      if (!path) return;
-      setIsLoading(true);
-      try {
-        const res = await fetch(`/file?path=${encodeURIComponent(path)}`);
-        const json = await res.json();
-        setLoadedMarkdown(json.rawMarkdown);
-      } finally {
-        setIsLoading(false);
       }
     });
   }
@@ -200,6 +180,26 @@ export default function App() {
 
   // ── Folder mode ───────────────────────────────────────────────────────────
   const { folderName, tree } = data;
+
+  // Folder mode: loaded markdown for current file
+  const [loadedMarkdown, setLoadedMarkdown] = createSignal("");
+  const [isLoading, setIsLoading] = createSignal(false);
+
+  // Folder mode: load file content when activeFile changes
+  createEffect(() => {
+    const path = activeFile();
+    if (!path) return;
+    const controller = new AbortController();
+    setIsLoading(true);
+    fetch(`/file?path=${encodeURIComponent(path)}`, { signal: controller.signal })
+      .then((res) => res.json())
+      .then((json: { rawMarkdown: string }) => setLoadedMarkdown(json.rawMarkdown))
+      .catch((err: Error) => {
+        if (err.name !== "AbortError") console.error(err);
+      })
+      .finally(() => setIsLoading(false));
+    onCleanup(() => controller.abort());
+  });
 
   const MIN_SIDEBAR = 160;
   const MAX_SIDEBAR = 600;
@@ -304,6 +304,7 @@ export default function App() {
 
         {/* Margin column */}
         <div class="pt-12 overflow-y-auto h-full pr-3">
+          {/* Not keyed: MarginCommentList filters by filename prop reactively — no need to destroy/recreate on file switch */}
           <Show when={activeFile()}>
             {(filename) => (
               <MarginCommentList
