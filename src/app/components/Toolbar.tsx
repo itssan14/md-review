@@ -1,8 +1,10 @@
 import { comments } from "../stores/comments";
-import { buildFeedback } from "../lib/feedback";
+import { buildFeedback, buildFolderFeedback } from "../lib/feedback";
 
 interface ToolbarProps {
-  filename: string;
+  mode: "file" | "folder";
+  filename?: string;
+  folderName?: string;
   generalTextRef: () => HTMLTextAreaElement | undefined;
   onToast: (msg: string) => void;
 }
@@ -12,12 +14,15 @@ export default function Toolbar(props: ToolbarProps) {
     return props.generalTextRef()?.value.trim() || "";
   }
 
+  function buildOutput() {
+    if (props.mode === "folder") {
+      return buildFolderFeedback(comments, getGeneralText(), props.folderName!);
+    }
+    return buildFeedback(comments, getGeneralText(), props.filename!);
+  }
+
   async function handleCopy() {
-    const { feedback, count } = buildFeedback(
-      comments,
-      getGeneralText(),
-      props.filename,
-    );
+    const { feedback, count } = buildOutput();
     try {
       await navigator.clipboard.writeText(feedback);
       props.onToast(count > 0 ? "Copied to clipboard" : "No comments to copy");
@@ -27,11 +32,7 @@ export default function Toolbar(props: ToolbarProps) {
   }
 
   async function handlePost() {
-    const { feedback, count } = buildFeedback(
-      comments,
-      getGeneralText(),
-      props.filename,
-    );
+    const { feedback, count } = buildOutput();
     try {
       await fetch("/post", {
         method: "POST",

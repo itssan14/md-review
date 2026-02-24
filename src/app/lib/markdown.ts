@@ -4,8 +4,11 @@ import hljs from "highlight.js";
 import { escapeForHTML } from "./feedback";
 
 const marked = new Marked();
+let configured = false;
 
 export function configureMarked() {
+  if (configured) return;
+  configured = true;
   marked.use({
     gfm: true,
     breaks: false,
