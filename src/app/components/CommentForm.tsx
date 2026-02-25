@@ -2,6 +2,7 @@ import { onMount } from "solid-js";
 import { addComment } from "../stores/comments";
 
 interface CommentFormProps {
+  filename: string;
   startLine: number;
   endLine: number;
   block?: HTMLElement;
@@ -24,6 +25,7 @@ export default function CommentForm(props: CommentFormProps) {
       props.onSave(text);
     } else {
       addComment({
+        filename: props.filename,
         startLine: props.startLine,
         endLine: props.endLine,
         context:

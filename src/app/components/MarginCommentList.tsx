@@ -10,9 +10,11 @@ export interface PendingFormData {
   startLine: number;
   endLine: number;
   context: string;
+  filename: string;
 }
 
 interface MarginCommentListProps {
+  filename?: string;
   contentAreaRef: () => HTMLElement | undefined;
   containerRef?: () => HTMLElement | undefined;
   listRef?: (el: HTMLElement) => void;
@@ -29,12 +31,18 @@ export default function MarginCommentList(props: MarginCommentListProps) {
   let listEl!: HTMLDivElement;
   const [positions, setPositions] = createStore<PositionedComment[]>([]);
 
+  function getFileComments() {
+    return props.filename
+      ? comments.filter((c) => c.filename === props.filename)
+      : [...comments];
+  }
+
   function recomputePositions() {
     const area = props.contentAreaRef();
     if (!area || !listEl) return;
 
-    // Sort comments by startLine
-    const sorted = [...comments].sort((a, b) => a.startLine - b.startLine);
+    // Sort current file's comments by startLine
+    const sorted = getFileComments().sort((a, b) => a.startLine - b.startLine);
 
     // Measure desired Y for each comment relative to listEl (not containerEl)
     const measured: { id: string; desiredY: number; height: number }[] = [];
@@ -113,13 +121,13 @@ export default function MarginCommentList(props: MarginCommentListProps) {
   return (
     <div
       data-margin-list
-      class="relative"
+      class="relative pointer-events-auto"
       ref={(el) => {
         listEl = el;
         props.listRef?.(el);
       }}
     >
-      <For each={[...comments].sort((a, b) => a.startLine - b.startLine)}>
+      <For each={getFileComments().sort((a, b) => a.startLine - b.startLine)}>
         {(comment) => (
           <MarginComment
             data-margin-card={comment.id}
@@ -138,6 +146,7 @@ export default function MarginCommentList(props: MarginCommentListProps) {
             }}
           >
             <CommentForm
+              filename={form().filename}
               startLine={form().startLine}
               endLine={form().endLine}
               context={form().context}

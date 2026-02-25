@@ -16,10 +16,12 @@ export interface CommentRequest {
   startLine: number;
   endLine: number;
   context: string;
+  filename: string;
 }
 
 interface ContentAreaProps {
   rawMarkdown: string;
+  filename: string;
   contentRef: (el: HTMLElement) => void;
   containerRef: () => HTMLElement | undefined;
   onCommentRequest: (req: CommentRequest) => void;
@@ -72,7 +74,11 @@ export default function ContentArea(props: ContentAreaProps) {
       () => comments.length,
       () => {
         const blocks = areaRef.querySelectorAll("[data-start-line]");
-        const commentedLines = new Set(comments.map((c) => c.startLine));
+        const commentedLines = new Set(
+          comments
+            .filter((c) => c.filename === props.filename)
+            .map((c) => c.startLine),
+        );
         blocks.forEach((block) => {
           const line = getIntAttr(block, "data-start-line");
           block.classList.toggle("has-comment", commentedLines.has(line));
@@ -91,6 +97,7 @@ export default function ContentArea(props: ContentAreaProps) {
       startLine: p.startLine,
       endLine: p.endLine,
       context: p.selectedText,
+      filename: props.filename,
     });
     window.getSelection()?.removeAllRanges();
   }
@@ -114,7 +121,7 @@ export default function ContentArea(props: ContentAreaProps) {
 
   return (
     <div class="relative">
-      <div ref={areaRef} id="content-area" class="px-10 pt-12 pb-32" />
+      <div ref={areaRef} id="content-area" class="pl-10 pr-80 pt-12 pb-32" />
 
       <FloatingCommentBtn
         pending={pending}
